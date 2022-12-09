@@ -22,7 +22,7 @@ pub struct Task {
 }
 
 impl SectionManager {
-    pub fn load_from_file(&self) -> Self {
+    pub fn load_from_file() -> Self {
         let xdg_dirs = BaseDirectories::with_prefix("tea_todo").unwrap();
 
         let path = Path::new("")
@@ -39,10 +39,7 @@ impl SectionManager {
                 .read_to_string(&mut data)
                 .expect("Failed to read the data.");
 
-            Self {
-                map: from_str(&data).unwrap(),
-                current_section: "".to_string(),
-            }
+            from_str(&data).unwrap()
         } else {
             Self {
                 map: HashMap::new(),
@@ -104,6 +101,20 @@ impl SectionManager {
     pub fn select_section(&mut self, section_name: &str) -> bool {
         if self.map.contains_key(section_name) {
             self.current_section = section_name.to_string();
+            true
+        } else { false }
+    }
+
+    pub fn add_section(&mut self, section_name: &str) -> bool {
+        if !self.map.contains_key(section_name) {
+            self.map.insert(section_name.to_string(), Section { tasks: HashMap::new() });
+            true
+        } else { false }
+    }
+
+    pub fn remove_section(&mut self, section_name: &str) -> bool {
+        if self.map.contains_key(section_name) {
+            self.map.remove(section_name);
             true
         } else { false }
     }
