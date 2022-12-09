@@ -52,6 +52,11 @@ pub mod cli_manager {
 
         match command.get_matches().subcommand() {
             Some(("list", _sub)) => {
+                if !backend.map.contains_key(&backend.current_section) {
+                    println!("{}", "The current section does not exist! Please make a new section and select it.".red());
+                    return
+                }
+
                 println!("Section {}", if backend.is_section_completed() { backend.current_section.green() } else { backend.current_section.red() });
                 for task in backend.get_tasks() {
                     println!("  {} - {}", if task.1.completed { task.0.green() } else { task.0.red() }, task.1.description);
@@ -92,7 +97,7 @@ pub mod cli_manager {
                     .map(|s| s.as_str())
                     .unwrap();
 
-                backend.remove_section(name);
+                println!("{}", backend.remove_section(name));
             }
             Some(("select_section", sub)) => {
                 let name = sub

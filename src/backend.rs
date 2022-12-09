@@ -65,6 +65,8 @@ impl SectionManager {
     }
 
     pub fn add_task(&mut self, task_name: &str, task_description: &str) -> String {
+        if !self.map.contains_key(&self.current_section) { return "The current section does not exist! Please make a new section and select it.".red().to_string() }
+
         if !self.map.get(&self.current_section).unwrap().tasks.contains_key(task_name) {
             self.map.get_mut(&self.current_section).unwrap().tasks.insert(task_name.to_string(), Task { description: task_description.to_string(), completed: false } );
             format!("Added task {}", task_name.green())
