@@ -1,7 +1,8 @@
 
 pub mod cli_manager {
-    use clap::{arg, Command, Subcommand};
+    use clap::{arg, Command};
     use colored::*;
+    use std::{io, io::Write};
 
     use crate::backend::SectionManager;
 
@@ -39,7 +40,13 @@ pub mod cli_manager {
             .subcommand(
                 Command::new("select_section")
                     .about("Select a section")
-                    .arg(arg!(<Name> "THe name of the section to select"))
+                    .arg(arg!(<Name> "The name of the section to select"))
+                    .arg_required_else_help(true)
+            )
+            .subcommand(
+                Command::new("set_completed")
+                    .about("Set whether a task is completed or not")
+                    .arg(arg!(<Name> "The name of the task to change"))
                     .arg_required_else_help(true)
             );
 
@@ -95,6 +102,33 @@ pub mod cli_manager {
                     .unwrap();
 
                 backend.select_section(name);
+            }
+            Some(("set_completed", sub)) => {
+                let name = sub
+                    .get_one::<String>("Name")
+                    .map(|s| s.as_str())
+                    .unwrap();
+
+                let result: bool = loop {
+                    print!("Is this task compelted (Y/n): ");
+                    io::stdout().flush().unwrap();
+
+                    let mut input = String::new();
+
+                    io::stdin()
+                        .read_line(&mut input)
+                        .expect("Failed to read user input");
+
+                    match input.trim().to_lowercase().as_str() {
+                        "y" | "" => break true,
+                        "n" => break false,
+                        _ => continue,
+                    }
+                };
+
+                println!("Setting {} to {}", name.green(), if result { "Completed" } else { "Uncompleted" });
+
+                backend.get_task_mut(name).completed = result;
             }
             _ => println!("Not implemented yet."),
         }
