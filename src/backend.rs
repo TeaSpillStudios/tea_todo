@@ -125,4 +125,10 @@ impl SectionManager {
     pub fn get_tasks(&'_ self) -> &'_ HashMap<String, Task> {
         &self.map.get(&self.current_section).unwrap().tasks
     }
+
+    pub fn is_section_completed_unsafe(&self, section_name: &str) -> bool {
+        let mut completed: bool = true;
+        for task in &self.map.get(section_name).unwrap().tasks { if !task.1.completed { completed = false } }
+        completed
+    }
 }
