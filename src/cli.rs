@@ -23,6 +23,24 @@ pub mod cli_manager {
                     .about("Remove a task")
                     .arg(arg!(<Name> "The name of the task"))
                     .arg_required_else_help(true)
+            )
+            .subcommand(
+                Command::new("add_section")
+                    .about("Add a section")
+                    .arg(arg!(<Name> "The name of the section to add"))
+                    .arg_required_else_help(true)
+            )
+            .subcommand(
+                Command::new("remove_section")
+                    .about("Remove a section")
+                    .arg(arg!(<Name> "The name of the section to remove"))
+                    .arg_required_else_help(true)
+            )
+            .subcommand(
+                Command::new("select_section")
+                    .about("Select a section")
+                    .arg(arg!(<Name> "THe name of the section to select"))
+                    .arg_required_else_help(true)
             );
 
         match command.get_matches().subcommand() {
@@ -53,6 +71,30 @@ pub mod cli_manager {
                     .unwrap();
 
                 println!("{}", backend.remove_task(name));
+            }
+            Some(("add_section", sub)) => {
+                let name = sub
+                    .get_one::<String>("Name")
+                    .map(|s| s.as_str())
+                    .unwrap();
+
+                println!("{}", backend.add_section(name));
+            }
+            Some(("remove_section", sub)) => {
+                let name = sub
+                    .get_one::<String>("Name")
+                    .map(|s| s.as_str())
+                    .unwrap();
+
+                backend.remove_section(name);
+            }
+            Some(("select_section", sub)) => {
+                let name = sub
+                    .get_one::<String>("Name")
+                    .map(|s| s.as_str())
+                    .unwrap();
+
+                backend.select_section(name);
             }
             _ => println!("Not implemented yet."),
         }
