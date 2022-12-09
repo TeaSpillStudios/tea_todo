@@ -100,4 +100,11 @@ impl SectionManager {
 
         completed
     }
+
+    pub fn select_section(&mut self, section_name: &str) -> bool {
+        if self.map.contains_key(section_name) {
+            self.current_section = section_name.to_string();
+            true
+        } else { false }
+    }
 }
