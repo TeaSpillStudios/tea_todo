@@ -67,8 +67,8 @@ impl SectionManager {
     pub fn add_task(&mut self, task_name: &str, task_description: &str) -> String {
         if !self.map.get(&self.current_section).unwrap().tasks.contains_key(task_name) {
             self.map.get_mut(&self.current_section).unwrap().tasks.insert(task_name.to_string(), Task { description: task_description.to_string(), completed: false } );
-            format!("Added task {}", task_name)
-        } else { String::from("Task already exists.") }
+            format!("Added task {}", task_name.green())
+        } else { String::from("Task already exists.").red().to_string() }
     }
 
     pub fn get_task_mut<'a>(
@@ -99,21 +99,21 @@ impl SectionManager {
         if self.map.contains_key(section_name) {
             self.current_section = section_name.to_string();
             format!("Selected section {}", section_name.green())
-        } else { String::from("Section does not exist") }
+        } else { String::from("Section does not exist").red().to_string() }
     }
 
     pub fn add_section(&mut self, section_name: &str) -> String {
         if !self.map.contains_key(section_name) {
             self.map.insert(section_name.to_string(), Section { tasks: HashMap::new() });
             format!("Added section {}", section_name.green())
-        } else { String::from("Section already exists.") }
+        } else { String::from("Section already exists.").red().to_string() }
     }
 
     pub fn remove_section(&mut self, section_name: &str) -> String {
         if self.map.contains_key(section_name) {
             self.map.remove(section_name);
             format!("Removed section {}", section_name.green())
-        } else { String::from("Section does not exist.") }
+        } else { String::from("Section does not exist.").red().to_string() }
     }
 
     pub fn remove_task(&mut self, task_name: &str) -> String {
@@ -122,6 +122,10 @@ impl SectionManager {
                 self.map.get_mut(&self.current_section).unwrap().tasks.remove(task_name);
                 format!("Removed task {}", task_name.green())
             } else { String::from("Task does not exist.") }
-        } else { String::from("Section does not exist.") }
+        } else { String::from("Section does not exist.").red().to_string() }
+    }
+
+    pub fn get_tasks(&'_ self) -> &'_ HashMap<String, Task> {
+        &self.map.get(&self.current_section).unwrap().tasks
     }
 }
