@@ -113,6 +113,11 @@ pub mod cli_manager {
                     .map(|s| s.as_str())
                     .unwrap();
 
+                if !backend.map.contains_key(&backend.current_section) {
+                    println!("{}", "The current section does not exist! Please make a new section and select it.".red());
+                    return
+                }
+
                 let result: bool = loop {
                     print!("Is this task compelted (Y/n): ");
                     io::stdout().flush().unwrap();
