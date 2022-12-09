@@ -3,6 +3,7 @@ use std::{fs::File, io::Read, io::Write, path::Path};
 use xdg::BaseDirectories;
 use ron::{de::from_str, ser::to_string};
 use serde::{Serialize, Deserialize};
+use colored::*;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SectionManager {
@@ -98,24 +99,33 @@ impl SectionManager {
         completed
     }
 
-    pub fn select_section(&mut self, section_name: &str) -> bool {
+    pub fn select_section(&mut self, section_name: &str) -> String {
         if self.map.contains_key(section_name) {
             self.current_section = section_name.to_string();
-            true
-        } else { false }
+            format!("Selected section {}", section_name.green())
+        } else { String::from("Section does not exist") }
     }
 
-    pub fn add_section(&mut self, section_name: &str) -> bool {
+    pub fn add_section(&mut self, section_name: &str) -> String {
         if !self.map.contains_key(section_name) {
             self.map.insert(section_name.to_string(), Section { tasks: HashMap::new() });
-            true
-        } else { false }
+            format!("Added section {}", section_name)
+        } else { String::from("Section already exists.") }
     }
 
-    pub fn remove_section(&mut self, section_name: &str) -> bool {
+    pub fn remove_section(&mut self, section_name: &str) -> String {
         if self.map.contains_key(section_name) {
             self.map.remove(section_name);
-            true
-        } else { false }
+            format!("Removed section {}", section_name)
+        } else { String::from("Section does not exist.") }
+    }
+
+    pub fn remove_task(&mut self, section_name: &str, task_name: &str) -> String {
+        if self.map.contains_key(section_name) {
+            if self.map.get(section_name).unwrap().tasks.contains_key(task_name) {
+                self.map.get_mut(section_name).unwrap().tasks.remove(task_name);
+                format!("Removed task {}", task_name)
+            } else { String::from("Task does not exist.") }
+        } else { String::from("Section does not exist.") }
     }
 }
