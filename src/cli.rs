@@ -47,7 +47,8 @@ pub mod cli_manager {
                     .about("Set whether a task is completed or not")
                     .arg(arg!(<Name> "The name of the task to change"))
                     .arg_required_else_help(true)
-            );
+            )
+            .subcommand(Command::new("list_sections").about("List out all the sections"));
 
         match command.get_matches().subcommand() {
             Some(("list", _sub)) => {
@@ -99,7 +100,7 @@ pub mod cli_manager {
                     .map(|s| s.as_str())
                     .unwrap();
 
-                backend.select_section(name);
+                println!("{}", backend.select_section(name));
             }
             Some(("set_completed", sub)) => {
                 let name = sub
@@ -125,6 +126,11 @@ pub mod cli_manager {
                 };
 
                 println!("{}", backend.set_task_completion(name, result));
+            }
+            Some(("list_sections", _sub)) => {
+                for section in &backend.map {
+                    println!("Section {}", if backend.is_section_completed_unsafe(section.0) { section.0.green() } else { section.0.red() });
+                };
             }
             _ => println!("Not implemented yet."),
         }
