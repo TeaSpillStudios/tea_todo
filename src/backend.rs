@@ -109,14 +109,14 @@ impl SectionManager {
     pub fn add_section(&mut self, section_name: &str) -> String {
         if !self.map.contains_key(section_name) {
             self.map.insert(section_name.to_string(), Section { tasks: HashMap::new() });
-            format!("Added section {}", section_name)
+            format!("Added section {}", section_name.green())
         } else { String::from("Section already exists.") }
     }
 
     pub fn remove_section(&mut self, section_name: &str) -> String {
         if self.map.contains_key(section_name) {
             self.map.remove(section_name);
-            format!("Removed section {}", section_name)
+            format!("Removed section {}", section_name.green())
         } else { String::from("Section does not exist.") }
     }
 
@@ -124,7 +124,7 @@ impl SectionManager {
         if self.map.contains_key(section_name) {
             if self.map.get(section_name).unwrap().tasks.contains_key(task_name) {
                 self.map.get_mut(section_name).unwrap().tasks.remove(task_name);
-                format!("Removed task {}", task_name)
+                format!("Removed task {}", task_name.green())
             } else { String::from("Task does not exist.") }
         } else { String::from("Section does not exist.") }
     }
