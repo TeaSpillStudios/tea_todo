@@ -71,16 +71,13 @@ impl SectionManager {
         } else { String::from("Task already exists.").red().to_string() }
     }
 
-    pub fn get_task_mut<'a>(
-        &'a mut self,
-        task_name: &'a str,
-    ) -> &'a mut Task {
-        self.map
-            .get_mut(&self.current_section)
-            .unwrap()
-            .tasks
-            .get_mut(task_name)
-            .unwrap()
+    pub fn set_task_completion(&mut self, task_name: &str, completion: bool) -> String {
+        if self.map.get(&self.current_section).unwrap().tasks.contains_key(task_name) {
+            self.map.get_mut(&self.current_section).unwrap().tasks.get_mut(task_name).unwrap().completed = completion;
+            format!("Setting task {} to {}", task_name.green(), if completion { "Completed" } else { "Uncompleted" })
+        } else {
+            String::from("Task doesn't exist.").red().to_string()
+        }
     }
 
     pub fn is_section_completed(&self) -> bool {

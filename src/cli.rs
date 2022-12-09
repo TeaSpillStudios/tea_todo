@@ -1,4 +1,3 @@
-
 pub mod cli_manager {
     use clap::{arg, Command};
     use colored::*;
@@ -56,7 +55,6 @@ pub mod cli_manager {
                 for task in backend.get_tasks() {
                     println!("  {} - {}", if task.1.completed { task.0.green() } else { task.0.red() }, task.1.description);
                 }
-                println!("\n");
             }
             Some(("add", sub)) => {
                 let name = sub
@@ -126,9 +124,7 @@ pub mod cli_manager {
                     }
                 };
 
-                println!("Setting {} to {}", name.green(), if result { "Completed" } else { "Uncompleted" });
-
-                backend.get_task_mut(name).completed = result;
+                println!("{}", backend.set_task_completion(name, result));
             }
             _ => println!("Not implemented yet."),
         }
