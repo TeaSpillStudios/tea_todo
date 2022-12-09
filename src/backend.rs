@@ -64,33 +64,29 @@ impl SectionManager {
             .expect("Failed to write data.");
     }
 
-    pub fn add_task(&mut self, section_name: &str, task_name: &str, task_description: &str) {
-        self.map.get_mut(section_name).unwrap().tasks.insert(
-            task_name.to_string(),
-            Task {
-                description: task_description.to_string(),
-                completed: false,
-            }
-        );
+    pub fn add_task(&mut self, task_name: &str, task_description: &str) -> String {
+        if !self.map.get(&self.current_section).unwrap().tasks.contains_key(task_name) {
+            self.map.get_mut(&self.current_section).unwrap().tasks.insert(task_name.to_string(), Task { description: task_description.to_string(), completed: false } );
+            format!("Added task {}", task_name)
+        } else { String::from("Task already exists.") }
     }
 
     pub fn get_task_mut<'a>(
         &'a mut self,
-        section_name: &'a str,
         task_name: &'a str,
     ) -> &'a mut Task {
         self.map
-            .get_mut(section_name)
+            .get_mut(&self.current_section)
             .unwrap()
             .tasks
             .get_mut(task_name)
             .unwrap()
     }
 
-    pub fn is_section_completed(&self, section_name: &str) -> bool {
+    pub fn is_section_completed(&self) -> bool {
         let mut completed: bool = true;
 
-        for task in &self.map.get(section_name).unwrap().tasks {
+        for task in &self.map.get(&self.current_section).unwrap().tasks {
             if !task.1.completed {
                 completed = false;
             }
@@ -120,10 +116,10 @@ impl SectionManager {
         } else { String::from("Section does not exist.") }
     }
 
-    pub fn remove_task(&mut self, section_name: &str, task_name: &str) -> String {
-        if self.map.contains_key(section_name) {
-            if self.map.get(section_name).unwrap().tasks.contains_key(task_name) {
-                self.map.get_mut(section_name).unwrap().tasks.remove(task_name);
+    pub fn remove_task(&mut self, task_name: &str) -> String {
+        if self.map.contains_key(&self.current_section) {
+            if self.map.get(&self.current_section).unwrap().tasks.contains_key(task_name) {
+                self.map.get_mut(&self.current_section).unwrap().tasks.remove(task_name);
                 format!("Removed task {}", task_name.green())
             } else { String::from("Task does not exist.") }
         } else { String::from("Section does not exist.") }
