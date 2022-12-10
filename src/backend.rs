@@ -1,9 +1,9 @@
+use colored::*;
+use ron::{de::from_str, ser::to_string};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::{fs::File, io::Read, io::Write, path::Path};
 use xdg::BaseDirectories;
-use ron::{de::from_str, ser::to_string};
-use serde::{Serialize, Deserialize};
-use colored::*;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SectionManager {
@@ -54,7 +54,7 @@ impl SectionManager {
 
         let conf = BaseDirectories::place_data_file(
             &BaseDirectories::with_prefix("tea_todo").unwrap(),
-            "lists.ron"
+            "lists.ron",
         )
         .expect("Cannot create the configurationd directory.");
 
@@ -65,18 +65,60 @@ impl SectionManager {
     }
 
     pub fn add_task(&mut self, task_name: &str, task_description: &str) -> String {
-        if !self.map.contains_key(&self.current_section) { return "The current section does not exist! Please make a new section and select it.".red().to_string() }
+        if !self.map.contains_key(&self.current_section) {
+            "The current section does not exist! Please make a new section and select it."
+                .red()
+                .to_string()
+        }
 
-        if !self.map.get(&self.current_section).unwrap().tasks.contains_key(task_name) {
-            self.map.get_mut(&self.current_section).unwrap().tasks.insert(task_name.to_string(), Task { description: task_description.to_string(), completed: false } );
+        if !self
+            .map
+            .get(&self.current_section)
+            .unwrap()
+            .tasks
+            .contains_key(task_name)
+        {
+            self.map
+                .get_mut(&self.current_section)
+                .unwrap()
+                .tasks
+                .insert(
+                    task_name.to_string(),
+                    Task {
+                        description: task_description.to_string(),
+                        completed: false,
+                    },
+                );
             format!("Added task {}", task_name.green())
-        } else { String::from("Task already exists.").red().to_string() }
+        } else {
+            String::from("Task already exists.").red().to_string()
+        }
     }
 
     pub fn set_task_completion(&mut self, task_name: &str, completion: bool) -> String {
-        if self.map.get(&self.current_section).unwrap().tasks.contains_key(task_name) {
-            self.map.get_mut(&self.current_section).unwrap().tasks.get_mut(task_name).unwrap().completed = completion;
-            format!("Setting task {} to {}", task_name.green(), if completion { "Completed" } else { "Uncompleted" })
+        if self
+            .map
+            .get(&self.current_section)
+            .unwrap()
+            .tasks
+            .contains_key(task_name)
+        {
+            self.map
+                .get_mut(&self.current_section)
+                .unwrap()
+                .tasks
+                .get_mut(task_name)
+                .unwrap()
+                .completed = completion;
+            format!(
+                "Setting task {} to {}",
+                task_name.green(),
+                if completion {
+                    "Completed"
+                } else {
+                    "Uncompleted"
+                }
+            )
         } else {
             String::from("Task doesn't exist.").red().to_string()
         }
@@ -98,30 +140,55 @@ impl SectionManager {
         if self.map.contains_key(section_name) {
             self.current_section = section_name.to_string();
             format!("Selected section {}", section_name.green())
-        } else { String::from("Section does not exist").red().to_string() }
+        } else {
+            String::from("Section does not exist").red().to_string()
+        }
     }
 
     pub fn add_section(&mut self, section_name: &str) -> String {
         if !self.map.contains_key(section_name) {
-            self.map.insert(section_name.to_string(), Section { tasks: HashMap::new() });
+            self.map.insert(
+                section_name.to_string(),
+                Section {
+                    tasks: HashMap::new(),
+                },
+            );
             format!("Added section {}", section_name.green())
-        } else { String::from("Section already exists.").red().to_string() }
+        } else {
+            String::from("Section already exists.").red().to_string()
+        }
     }
 
     pub fn remove_section(&mut self, section_name: &str) -> String {
         if self.map.contains_key(section_name) {
             self.map.remove(section_name);
             format!("Removed section {}", section_name.green())
-        } else { String::from("Section does not exist.").red().to_string() }
+        } else {
+            String::from("Section does not exist.").red().to_string()
+        }
     }
 
     pub fn remove_task(&mut self, task_name: &str) -> String {
         if self.map.contains_key(&self.current_section) {
-            if self.map.get(&self.current_section).unwrap().tasks.contains_key(task_name) {
-                self.map.get_mut(&self.current_section).unwrap().tasks.remove(task_name);
+            if self
+                .map
+                .get(&self.current_section)
+                .unwrap()
+                .tasks
+                .contains_key(task_name)
+            {
+                self.map
+                    .get_mut(&self.current_section)
+                    .unwrap()
+                    .tasks
+                    .remove(task_name);
                 format!("Removed task {}", task_name.green())
-            } else { String::from("Task does not exist.") }
-        } else { String::from("Section does not exist.").red().to_string() }
+            } else {
+                String::from("Task does not exist.")
+            }
+        } else {
+            String::from("Section does not exist.").red().to_string()
+        }
     }
 
     pub fn get_tasks(&'_ self) -> &'_ HashMap<String, Task> {
@@ -130,7 +197,11 @@ impl SectionManager {
 
     pub fn is_section_completed_unsafe(&self, section_name: &str) -> bool {
         let mut completed: bool = true;
-        for task in &self.map.get(section_name).unwrap().tasks { if !task.1.completed { completed = false } }
+        for task in &self.map.get(section_name).unwrap().tasks {
+            if !task.1.completed {
+                completed = false
+            }
+        }
         completed
     }
 }
