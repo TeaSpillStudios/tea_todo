@@ -138,7 +138,7 @@ pub mod cli_manager {
                 for section in &backend.map {
                     println!(
                         "Section {}",
-                        if backend.is_section_completed_unsafe(section.0) {
+                        if &backend.current_section == section.0 {
                             section.0.green()
                         } else {
                             section.0.red()
