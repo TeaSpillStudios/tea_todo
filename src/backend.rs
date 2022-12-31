@@ -56,7 +56,7 @@ impl SectionManager {
             &BaseDirectories::with_prefix("tea_todo").unwrap(),
             "lists.ron",
         )
-        .expect("Cannot create the configurationd directory.");
+        .expect("Cannot create the configuration directory.");
 
         let mut conf = File::create(conf).unwrap();
 
