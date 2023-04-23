@@ -1,12 +1,15 @@
 pub mod cli_manager {
     use clap::{arg, Command};
+    use clap_complete::shells::{Elvish, Fish, Zsh};
+    use clap_complete::{generate, shells::Bash};
     use colored::*;
+    use std::env;
     use std::{io, io::Write};
 
     use crate::backend::SectionManager;
 
     pub fn start(backend: &mut SectionManager) {
-        let command = Command::new("TeaToDo")
+        let mut command = Command::new("TeaToDo")
             .about("A CLI ToDo app.")
             .subcommand_required(true)
             .arg_required_else_help(true)
@@ -50,7 +53,25 @@ pub mod cli_manager {
             )
             .subcommand(Command::new("list_sections").about("List out all the sections"));
 
-        match command.get_matches().subcommand() {
+        let args: Vec<String> = env::args().collect();
+
+        if args.len() > 1 {
+            if args[1].contains("generate-bash-completions") {
+                generate(Bash, &mut command, "tea_todo", &mut io::stdout());
+                return;
+            } else if args[1].contains("generate-elvish-completions") {
+                generate(Elvish, &mut command, "tea_todo", &mut io::stdout());
+                return;
+            } else if args[1].contains("generate-fish-completions") {
+                generate(Fish, &mut command, "tea_todo", &mut io::stdout());
+                return;
+            } else if args[1].contains("generate-zsh-completions") {
+                generate(Zsh, &mut command, "tea_todo", &mut io::stdout());
+                return;
+            }
+        }
+
+        match command.clone().get_matches().subcommand() {
             Some(("list", _sub)) => {
                 if !backend.map.contains_key(&backend.current_section) {
                     println!("{}", "The current section does not exist! Please make a new section and select it.".red());
